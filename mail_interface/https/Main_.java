@@ -1,4 +1,4 @@
-package mail_interface;
+package mail_interface.https;
 
 import java.io.IOException;
 import java.net.URI;
