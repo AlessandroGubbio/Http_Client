@@ -11,7 +11,7 @@ import java.util.Scanner;
 
 // pag 2 &o=2   torna un boolean se ci sta un risultato
 public class Subito {
-    public static void Stamparisultati(String sResp) {
+    public static boolean Stamparisultati(String sResp) {
         String sPrima = "SmallCard-module_item-title__1y5U3\">";
         String sDopo = "</h2><div class=\"\"><div class=\"";
         int iPos = sResp.indexOf("Nessun risultato al momento...");
@@ -21,6 +21,7 @@ public class Subito {
         {
             //Ho finito
             System.out.println("Mi dispiace, non ci sono risultati");
+            return false;
         }
         else
         {
@@ -37,6 +38,7 @@ public class Subito {
                 else
                     iPos = -1;
             }
+            return true;
         }
         //SmallCard-module_item-title__1y5U3">"
         //</h2><div class=""><div class="
@@ -55,7 +57,7 @@ public class Subito {
         String regione = scanner.nextLine();
         System.out.println("città? ");
         String citta = scanner.nextLine();
-        String url = "https://subito.it/annunci-" + regione + "/vendita/" + categoria + "/" + citta + "/?q=" + cosa;
+        String url = "https://subito.it/annunci-" + regione + "/vendita/" + categoria + "/" + citta + "/?q=" + cosa + "&o=";
         System.out.println(url);
 
         HttpClient client = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1)
@@ -65,13 +67,20 @@ public class Subito {
                 .uri(URI.create(url)).GET().build();
 
         HttpResponse<String> response;
+        HttpResponse<String> response2;
         try{
             response = client.send(httpRequest, HttpResponse.BodyHandlers.ofString());
             String sAppo = response.body();
             System.out.println("satatus: " + response.statusCode());
-            //System.out.println(sAppo);
-            // while stampa finche torna risultati
-            Stamparisultati(response.body());
+            int i = 1;
+            System.out.println("\nStampo pagina 1\n");
+            while (Stamparisultati((client.send(HttpRequest.newBuilder().uri(URI.create(url+i)).GET().build(),
+                    HttpResponse.BodyHandlers.ofString())).body())){
+                System.out.println("\nStampo pagina " + (i + 1) + "\n");
+                i++;
+            }
+
+
         } catch (IOException | InterruptedException e){
             e.printStackTrace();
         }
